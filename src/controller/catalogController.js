@@ -46,6 +46,7 @@ async function listTheaters(req, res, next) {
   }
 }
 
+
 async function getTheater(req, res, next) {
   try {
     const { id } = req.params;

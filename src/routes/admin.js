@@ -2,6 +2,7 @@ const express = require("express");
 const validateBody = require("../middleware/validateBody");
 const { authenticate, requireRole } = require("../middleware/auth");
 const catalogController = require("../controller/catalogController");
+const schedulingController = require("../controller/schedulingController");
 
 const router = express.Router();
 
@@ -593,6 +594,90 @@ router.delete(
   authenticate,
   requireRole("admin"),
   catalogController.deleteMenuItem,
+);
+
+// ==========================================
+// PRICING RULE VALIDATORS & ROUTES
+// ==========================================
+
+const validateCreatePricingRule = validateBody((body) =>
+  schedulingController.validatePricingRuleBody(body),
+);
+
+const validateUpdatePricingRule = validateBody((body) =>
+  schedulingController.validatePricingRuleBody(body, { partial: true }),
+);
+
+router.post(
+  "/admin/pricing-rules",
+  authenticate,
+  requireRole("admin"),
+  validateCreatePricingRule,
+  schedulingController.createPricingRule,
+);
+
+router.get(
+  "/admin/pricing-rules",
+  authenticate,
+  requireRole("admin"),
+  schedulingController.listPricingRules,
+);
+
+router.put(
+  "/admin/pricing-rules/:id",
+  authenticate,
+  requireRole("admin"),
+  validateUpdatePricingRule,
+  schedulingController.updatePricingRule,
+);
+
+router.delete(
+  "/admin/pricing-rules/:id",
+  authenticate,
+  requireRole("admin"),
+  schedulingController.deletePricingRule,
+);
+
+// ==========================================
+// SHOWTIME VALIDATORS & ROUTES
+// ==========================================
+
+const validateCreateShowtime = validateBody((body) =>
+  schedulingController.validateCreateShowtimeBody(body),
+);
+
+const validateUpdateShowtime = validateBody((body) =>
+  schedulingController.validateUpdateShowtimeBody(body),
+);
+
+router.post(
+  "/admin/showtimes",
+  authenticate,
+  requireRole("admin"),
+  validateCreateShowtime,
+  schedulingController.createShowtime,
+);
+
+router.get(
+  "/admin/showtimes",
+  authenticate,
+  requireRole("admin"),
+  schedulingController.listAdminShowtimes,
+);
+
+router.get(
+  "/admin/showtimes/:id",
+  authenticate,
+  requireRole("admin"),
+  schedulingController.getAdminShowtime,
+);
+
+router.put(
+  "/admin/showtimes/:id",
+  authenticate,
+  requireRole("admin"),
+  validateUpdateShowtime,
+  schedulingController.updateShowtime,
 );
 
 module.exports = router;

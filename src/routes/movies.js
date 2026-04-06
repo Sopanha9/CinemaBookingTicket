@@ -1,6 +1,7 @@
 const express = require("express");
 const validateBody = require("../middleware/validateBody");
 const { createMovie } = require("../controller/movieController");
+const schedulingController = require("../controller/schedulingController");
 
 const router = express.Router();
 
@@ -34,5 +35,15 @@ const validateCreateMovie = validateBody((body) => {
 });
 
 router.post("/movies", validateCreateMovie, createMovie);
+
+router.get("/movies/showtimes", schedulingController.listPublicShowtimes);
+router.get(
+  "/movies/showtimes/:id/pricing",
+  schedulingController.getShowtimePricing,
+);
+router.get(
+  "/movies/showtimes/:id/seats/availability",
+  schedulingController.getShowtimeSeatAvailability,
+);
 
 module.exports = router;
