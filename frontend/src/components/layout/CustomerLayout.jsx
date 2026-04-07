@@ -1,4 +1,7 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { logout } from "../../features/auth/api";
+import { useAuthStore } from "../../features/auth/authStore";
+import { toastSuccess } from "../../lib/toast";
 
 const customerLinks = [
   { to: "/showtimes", label: "Now Showing" },
@@ -15,6 +18,17 @@ const navLinkClass = ({ isActive }) =>
   ].join(" ");
 
 export default function CustomerLayout() {
+  const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+
+  const handleLogout = () => {
+    void logout();
+    clearAuth();
+    navigate("/login");
+    toastSuccess("Logged out");
+  };
+
   return (
     <div className="min-h-screen bg-base-100 text-base-content">
       <header className="border-b border-base-300 bg-base-100/90 backdrop-blur">
@@ -37,12 +51,22 @@ export default function CustomerLayout() {
           </nav>
 
           <div className="ml-auto flex min-w-[120px] items-center justify-end">
-            <button
-              type="button"
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
-            >
-              Sign In
-            </button>
+            {isAuthenticated ? (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+              >
+                Logout
+              </button>
+            ) : (
+              <NavLink
+                to="/login"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+              >
+                Sign In
+              </NavLink>
+            )}
           </div>
         </div>
       </header>

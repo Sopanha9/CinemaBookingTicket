@@ -18,7 +18,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error?.response?.status === 401) {
+    const status = error?.response?.status;
+    const details = error?.response?.data?.details;
+    const requestUrl = error?.config?.url || "";
+    const isAuthLogin = /\/auth\/login\/?$/.test(requestUrl);
+
+    if (status === 401 && !isAuthLogin) {
       localStorage.removeItem("cinema_token");
       window.location.href = "/login";
     }
@@ -28,6 +33,8 @@ api.interceptors.response.use(
     const requestId = error?.response?.data?.requestId;
 
     const err = new Error(message);
+    err.status = status;
+    err.details = details;
     err.requestId = requestId;
 
     return Promise.reject(err);
