@@ -4,3 +4,8 @@ node_modules
 
 /generated/prisma
 
+.github
+# add .vscode
+# add .idea
+
+docs

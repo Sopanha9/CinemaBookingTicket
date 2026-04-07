@@ -5,8 +5,7 @@
 
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -208,6 +207,7 @@ model Showtime {
   bookingSeats BookingSeat[]
 
   @@unique([screenId, startTime])
+  @@index([startTime, status])
   @@map("showtimes")
 }
 
@@ -233,6 +233,8 @@ model SeatLock {
   user     User     @relation(fields: [userId], references: [id])
 
   @@unique([seatId, showtimeId])
+  @@index([showtimeId, lockedUntil])
+  @@index([userId, showtimeId])
   @@map("seat_locks")
 }
 
@@ -255,6 +257,8 @@ model Booking {
   payments     Payment[]
   bookingItems BookingItem[]
 
+  @@index([userId, bookingTime])
+  @@index([showtimeId, status])
   @@map("bookings")
 }
 
@@ -279,6 +283,7 @@ model BookingSeat {
   seat     Seat     @relation(fields: [seatId], references: [id])
 
   @@unique([showtimeId, seatId])
+  @@index([bookingId])
   @@map("booking_seats")
 }
 
@@ -290,12 +295,13 @@ model Payment {
   bookingId     Int           @map("booking_id")
   amount        Decimal       @db.Decimal(10, 2)
   paymentMethod PaymentMethod @default(upi) @map("payment_method")
-  transactionId String?       @map("transaction_id") @db.VarChar(255)
+  transactionId String?       @unique @map("transaction_id") @db.VarChar(255)
   status        PaymentStatus @default(pending)
   paymentTime   DateTime      @default(now()) @map("payment_time")
 
   booking Booking @relation(fields: [bookingId], references: [id])
 
+  @@index([bookingId, status])
   @@map("payments")
 }
 
