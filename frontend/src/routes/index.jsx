@@ -1,6 +1,13 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import AdminLayout from "../components/layout/AdminLayout";
 import CustomerLayout from "../components/layout/CustomerLayout";
+import AdminGenresPage from "../pages/AdminGenresPage";
+import AdminMenuItemsPage from "../pages/AdminMenuItemsPage";
+import AdminMoviesPage from "../pages/AdminMoviesPage";
+import AdminPricingRulesPage from "../pages/AdminPricingRulesPage";
+import AdminScreensPage from "../pages/AdminScreensPage";
+import AdminShowtimesPage from "../pages/AdminShowtimesPage";
+import AdminTheatersPage from "../pages/AdminTheatersPage";
 import BookingDetailPage from "../pages/BookingDetailPage";
 import ConfirmPage from "../pages/ConfirmPage";
 import LoginPage from "../pages/LoginPage";
@@ -10,13 +17,6 @@ import RegisterPage from "../pages/RegisterPage";
 import ShowtimeDetailPage from "../pages/ShowtimeDetailPage";
 import ShowtimesPage from "../pages/ShowtimesPage";
 import {
-  AdminGenresPage,
-  AdminMenuItemsPage,
-  AdminMoviesPage,
-  AdminPricingRulesPage,
-  AdminScreensPage,
-  AdminShowtimesPage,
-  AdminTheatersPage,
   BookingReportPage,
   OccupancyReportPage,
   OperationsPage,
