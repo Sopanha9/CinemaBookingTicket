@@ -3,6 +3,8 @@ import AdminLayout from "../components/layout/AdminLayout";
 import CustomerLayout from "../components/layout/CustomerLayout";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
+import ShowtimeDetailPage from "../pages/ShowtimeDetailPage";
+import ShowtimesPage from "../pages/ShowtimesPage";
 import {
   AdminGenresPage,
   AdminMenuItemsPage,
@@ -19,8 +21,6 @@ import {
   OperationsPage,
   PaymentPage,
   RevenueReportPage,
-  ShowtimeDetailPage,
-  ShowtimesPage,
   TopMoviesPage,
 } from "../pages/placeholders";
 import AdminRoute from "./AdminRoute";

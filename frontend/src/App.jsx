@@ -6,10 +6,7 @@ import { me } from "./features/auth/api";
 import { TOKEN_STORAGE_KEY, useAuthStore } from "./features/auth/authStore";
 import { Skeleton } from "./components/ui/Skeleton";
 import { queryClient } from "./lib/queryClient";
-import { toastSuccess } from "./lib/toast";
 import { router } from "./routes";
-
-let hasShownFoundationToast = false;
 
 function App() {
   const isLoading = useAuthStore((state) => state.isLoading);
@@ -19,11 +16,6 @@ function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", "cinema");
-
-    if (!hasShownFoundationToast) {
-      toastSuccess("Foundation ready");
-      hasShownFoundationToast = true;
-    }
   }, []);
 
   useEffect(() => {
