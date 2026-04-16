@@ -86,6 +86,8 @@ export default function ShowtimeDetailPage() {
 
   const isLoading = seatsQuery.isPending || pricingQuery.isPending;
   const hasError = seatsQuery.isError || pricingQuery.isError;
+  const isForbidden =
+    seatsQuery.error?.status === 403 || pricingQuery.error?.status === 403;
 
   const seatData = seatsQuery.data;
   const pricingData = pricingQuery.data;
@@ -192,7 +194,9 @@ export default function ShowtimeDetailPage() {
         <CardContent className="pt-6">
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-error">
-              Failed to load showtime details. Please try again.
+              {isForbidden
+                ? "You don't have permission to view this."
+                : "Failed to load showtime details. Please try again."}
             </p>
             <Button
               type="button"
@@ -251,6 +255,17 @@ export default function ShowtimeDetailPage() {
                   const selected = selectedSeatIds.includes(seat.id);
                   const availability = seat.availability || "locked";
                   const seatLabel = `${seat.rowNumber}-${seat.columnNumber}`;
+                  const availabilityLabel =
+                    availability === "available"
+                      ? "Available"
+                      : availability === "locked"
+                        ? "Locked"
+                        : "Booked";
+                  const seatTypeLabel =
+                    typeof seat.seatType === "string" &&
+                    seat.seatType.length > 0
+                      ? `${seat.seatType.charAt(0).toUpperCase()}${seat.seatType.slice(1)}`
+                      : "Standard";
 
                   return (
                     <button
@@ -259,7 +274,7 @@ export default function ShowtimeDetailPage() {
                       disabled={availability !== "available"}
                       onClick={() => handleToggleSeat(seat)}
                       title={`${seatLabel} ${availability}`}
-                      aria-label={`Seat ${seatLabel} - ${availability}`}
+                      aria-label={`Row ${seat.rowNumber} Seat ${seat.columnNumber} - ${seatTypeLabel} - ${availabilityLabel}`}
                       className={[
                         "min-w-14 rounded-lg border px-2 py-2 text-xs font-semibold transition",
                         statusStyle[availability],

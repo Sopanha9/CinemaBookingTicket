@@ -156,6 +156,27 @@ export default function ConfirmPage() {
     }
 
     try {
+      const freshSeats = await seatsQuery.refetch();
+      const freshSeatRows = freshSeats?.data?.seats || [];
+      const freshSeatMap = new Map(
+        freshSeatRows.map((seat) => [seat.id, seat]),
+      );
+
+      const hasUnavailableSeat = selectedSeatIds.some((seatId) => {
+        const seat = freshSeatMap.get(seatId);
+        return seat?.availability !== "available";
+      });
+
+      if (hasUnavailableSeat) {
+        hasConfirmedRef.current = true;
+        toastConflict(
+          "A seat you selected is no longer available - please reselect",
+        );
+        clearBooking();
+        navigate(`/showtimes/${showtimeId}`);
+        return;
+      }
+
       const booking = await confirmMutation.mutateAsync();
       hasConfirmedRef.current = true;
       clearBooking();

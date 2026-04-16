@@ -63,6 +63,7 @@ export default function MyBookingsPage() {
   });
 
   const bookings = Array.isArray(query.data) ? query.data : [];
+  const isForbidden = query.error?.status === 403;
 
   if (query.isPending) {
     return (
@@ -79,7 +80,11 @@ export default function MyBookingsPage() {
       <Card className="border-error/50">
         <CardContent className="pt-6">
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-error">Failed to load bookings.</p>
+            <p className="text-sm text-error">
+              {isForbidden
+                ? "You don't have permission to view this."
+                : "Failed to load bookings."}
+            </p>
             <button
               type="button"
               onClick={() => query.refetch()}

@@ -88,6 +88,8 @@ export default function BookingDetailPage() {
   });
 
   const booking = query.data;
+  const isBookingForbidden = query.error?.status === 403;
+  const isPaymentForbidden = bookingPaymentsQuery.error?.status === 403;
   const latestPayment = Array.isArray(bookingPaymentsQuery.data)
     ? bookingPaymentsQuery.data[0]
     : null;
@@ -139,7 +141,9 @@ export default function BookingDetailPage() {
         <CardContent className="pt-6">
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-error">
-              Failed to load booking details.
+              {isBookingForbidden
+                ? "You don't have permission to view this."
+                : "Failed to load booking details."}
             </p>
             <Button type="button" onClick={() => query.refetch()}>
               Retry
@@ -216,7 +220,9 @@ export default function BookingDetailPage() {
           {bookingPaymentsQuery.isError ? (
             <div className="flex items-center justify-between gap-3 rounded-lg border border-error/40 bg-error/10 p-3">
               <p className="text-sm text-error">
-                Failed to load payment status.
+                {isPaymentForbidden
+                  ? "You don't have permission to view this."
+                  : "Failed to load payment status."}
               </p>
               <Button
                 type="button"

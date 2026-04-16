@@ -36,6 +36,7 @@ export default function RevenueReportPage() {
   });
 
   const data = query.data;
+  const isForbidden = query.error?.status === 403;
   const isEmpty =
     !query.isPending && !query.isError && Number(data?.paymentCount || 0) === 0;
 
@@ -67,7 +68,9 @@ export default function RevenueReportPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm text-error">
-                Failed to load revenue report.
+                {isForbidden
+                  ? "You don't have permission to view this."
+                  : "Failed to load revenue report."}
               </p>
               <Button type="button" onClick={() => query.refetch()}>
                 Retry

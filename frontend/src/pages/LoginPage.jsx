@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,6 +23,14 @@ import {
 export default function LoginPage() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
+
+  useEffect(() => {
+    const authNotice = sessionStorage.getItem("cinema_auth_notice");
+    if (authNotice === "expired") {
+      toastAuth("Your session has expired - please log in again");
+      sessionStorage.removeItem("cinema_auth_notice");
+    }
+  }, []);
 
   const {
     register,

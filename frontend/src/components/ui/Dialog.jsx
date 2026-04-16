@@ -1,5 +1,15 @@
+import { useEffect, useRef } from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "../../lib/utils";
+
+const focusableSelector = [
+  "a[href]",
+  "button:not([disabled])",
+  "textarea:not([disabled])",
+  'input:not([disabled]):not([type="hidden"])',
+  "select:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
 
 const dialogOverlayVariants = cva(
   "fixed inset-0 z-50 flex items-center justify-center p-4",
@@ -54,10 +64,73 @@ export function Dialog({
   children,
   ...props
 }) {
+  const containerRef = useRef(null);
+  const previousActiveElementRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    previousActiveElementRef.current = document.activeElement;
+    const container = containerRef.current;
+    if (!container) return undefined;
+
+    const focusable = container.querySelectorAll(focusableSelector);
+    const firstFocusable = focusable[0];
+    if (firstFocusable) {
+      firstFocusable.focus();
+    } else {
+      container.focus();
+    }
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onOpenChange?.(false);
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const nodes = Array.from(container.querySelectorAll(focusableSelector));
+      if (nodes.length === 0) {
+        event.preventDefault();
+        container.focus();
+        return;
+      }
+
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    container.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      container.removeEventListener("keydown", onKeyDown);
+      const previous = previousActiveElementRef.current;
+      if (previous && typeof previous.focus === "function") {
+        previous.focus();
+      }
+    };
+  }, [onOpenChange, open]);
+
   if (!open) return null;
 
   return (
     <div
+      ref={containerRef}
+      role="dialog"
+      aria-modal="true"
+      tabIndex={-1}
       className={cn(dialogOverlayVariants({ variant, size }), className)}
       {...props}
     >
@@ -72,10 +145,20 @@ export function Dialog({
   );
 }
 
-export function DialogContent({ className, variant, size, children, ...props }) {
+export function DialogContent({
+  className,
+  variant,
+  size,
+  children,
+  ...props
+}) {
   return (
     <div
-      className={cn(dialogContentVariants({ variant, size }), "relative", className)}
+      className={cn(
+        dialogContentVariants({ variant, size }),
+        "relative",
+        className,
+      )}
       {...props}
     >
       {children}

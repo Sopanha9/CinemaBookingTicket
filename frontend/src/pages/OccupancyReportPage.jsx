@@ -34,6 +34,7 @@ export default function OccupancyReportPage() {
   });
 
   const rows = useMemo(() => query.data?.rows || [], [query.data?.rows]);
+  const isForbidden = query.error?.status === 403;
 
   return (
     <section className="space-y-5">
@@ -65,7 +66,9 @@ export default function OccupancyReportPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm text-error">
-                    Failed to load occupancy report.
+                    {isForbidden
+                      ? "You don't have permission to view this."
+                      : "Failed to load occupancy report."}
                   </p>
                   <Button type="button" onClick={() => query.refetch()}>
                     Retry

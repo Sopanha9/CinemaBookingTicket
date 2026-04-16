@@ -178,6 +178,8 @@ export default function PaymentPage() {
     paidNavigatedRef.current = false;
   };
 
+  const isPaymentForbidden = existingPaymentsQuery.error?.status === 403;
+
   if (!Number.isInteger(bookingId) || bookingId <= 0) {
     return (
       <Card className="border-error/50">
@@ -203,7 +205,9 @@ export default function PaymentPage() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-error">
-              Failed to load payment details.
+              {isPaymentForbidden
+                ? "You don't have permission to view this."
+                : "Failed to load payment details."}
             </p>
             <Button
               type="button"

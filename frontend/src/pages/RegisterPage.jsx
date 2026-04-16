@@ -50,7 +50,10 @@ export default function RegisterPage() {
       }
 
       if (err?.status === 409) {
-        toastConflict("An account with this email already exists");
+        toastConflict(
+          "An account with this email already exists",
+          err?.requestId,
+        );
         return;
       }
 

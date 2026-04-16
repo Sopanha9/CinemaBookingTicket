@@ -113,6 +113,7 @@ export default function ShowtimesPage() {
 
   const isLoading = showtimesQuery.isPending;
   const isError = showtimesQuery.isError;
+  const isForbidden = showtimesQuery.error?.status === 403;
 
   return (
     <section className="space-y-6">
@@ -218,7 +219,9 @@ export default function ShowtimesPage() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-error">
-                Failed to load showtimes. Please try again.
+                {isForbidden
+                  ? "You don't have permission to view this."
+                  : "Failed to load showtimes. Please try again."}
               </p>
               <button
                 type="button"

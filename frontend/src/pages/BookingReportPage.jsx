@@ -51,6 +51,7 @@ export default function BookingReportPage() {
     !query.isPending &&
     !query.isError &&
     Number(query.data?.totalBookings || 0) === 0;
+  const isForbidden = query.error?.status === 403;
 
   return (
     <section className="space-y-5">
@@ -90,7 +91,9 @@ export default function BookingReportPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm text-error">
-                Failed to load booking report.
+                {isForbidden
+                  ? "You don't have permission to view this."
+                  : "Failed to load booking report."}
               </p>
               <Button type="button" onClick={() => query.refetch()}>
                 Retry
