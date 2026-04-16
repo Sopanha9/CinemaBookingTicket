@@ -9,20 +9,18 @@ import AdminScreensPage from "../pages/AdminScreensPage";
 import AdminShowtimesPage from "../pages/AdminShowtimesPage";
 import AdminTheatersPage from "../pages/AdminTheatersPage";
 import BookingDetailPage from "../pages/BookingDetailPage";
+import BookingReportPage from "../pages/BookingReportPage";
 import ConfirmPage from "../pages/ConfirmPage";
 import LoginPage from "../pages/LoginPage";
 import MyBookingsPage from "../pages/MyBookingsPage";
+import OccupancyReportPage from "../pages/OccupancyReportPage";
+import OperationsPage from "../pages/OperationsPage";
 import PaymentPage from "../pages/PaymentPage";
 import RegisterPage from "../pages/RegisterPage";
+import RevenueReportPage from "../pages/RevenueReportPage";
 import ShowtimeDetailPage from "../pages/ShowtimeDetailPage";
 import ShowtimesPage from "../pages/ShowtimesPage";
-import {
-  BookingReportPage,
-  OccupancyReportPage,
-  OperationsPage,
-  RevenueReportPage,
-  TopMoviesPage,
-} from "../pages/placeholders";
+import TopMoviesPage from "../pages/TopMoviesPage";
 import AdminRoute from "./AdminRoute";
 import ProtectedRoute from "./ProtectedRoute";
 
