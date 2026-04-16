@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
@@ -14,7 +14,9 @@ import {
   getShowtimePricing,
   getShowtimeSeats,
 } from "../features/showtimes/api";
-import { toastError } from "../lib/toast";
+import { createLock } from "../features/booking/api";
+import { useBookingStore } from "../features/booking/bookingStore";
+import { toastConflict, toastError } from "../lib/toast";
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat(undefined, {
@@ -45,7 +47,12 @@ const statusStyle = {
 export default function ShowtimeDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [selectedSeatIds, setSelectedSeatIds] = useState([]);
+  const initializedShowtimeRef = useRef(null);
+  const selectedSeatIds = useBookingStore((state) => state.selectedSeatIds);
+  const lockMinutes = useBookingStore((state) => state.lockMinutes);
+  const toggleSeat = useBookingStore((state) => state.toggleSeat);
+  const initSelection = useBookingStore((state) => state.initSelection);
+  const setLock = useBookingStore((state) => state.setLock);
 
   const seatsQuery = useQuery({
     queryKey: ["showtime-seats", id],
@@ -100,30 +107,73 @@ export default function ShowtimeDetailPage() {
   }, [seats]);
 
   const seatPriceById = useMemo(() => {
-    const map = new Map();
+    const map = {};
     for (const seat of seats) {
-      map.set(seat.id, Number(seat.price || 0));
+      map[seat.id] = Number(seat.price || 0);
     }
     return map;
   }, [seats]);
 
+  useEffect(() => {
+    if (id && seats.length > 0 && initializedShowtimeRef.current !== id) {
+      initSelection(id, seatPriceById);
+      initializedShowtimeRef.current = id;
+    }
+  }, [id, initSelection, seatPriceById, seats.length]);
+
   const total = useMemo(() => {
     return selectedSeatIds.reduce(
-      (sum, seatId) => sum + (seatPriceById.get(seatId) || 0),
+      (sum, seatId) => sum + (seatPriceById[seatId] || 0),
       0,
     );
   }, [seatPriceById, selectedSeatIds]);
 
-  const toggleSeat = (seat) => {
+  const lockMutation = useMutation({
+    mutationFn: ({ showtimeId, seatIds, lockMinutes }) =>
+      createLock({ showtimeId, seatIds, lockMinutes }),
+  });
+
+  const handleToggleSeat = (seat) => {
     if (seat.availability !== "available") {
       return;
     }
 
-    setSelectedSeatIds((prev) =>
-      prev.includes(seat.id)
-        ? prev.filter((seatId) => seatId !== seat.id)
-        : [...prev, seat.id],
-    );
+    toggleSeat(seat.id);
+  };
+
+  const handleSelectSeats = async () => {
+    if (!id || selectedSeatIds.length === 0) {
+      return;
+    }
+
+    try {
+      const lockData = await lockMutation.mutateAsync({
+        showtimeId: id,
+        seatIds: selectedSeatIds,
+        lockMinutes,
+      });
+
+      const expiresAt = lockData?.expiresAt || lockData?.lockedUntil;
+      if (expiresAt) {
+        setLock(new Date(expiresAt));
+      }
+
+      navigate("/bookings/confirm");
+    } catch (err) {
+      if (err?.status === 409) {
+        toastConflict(
+          "Some seats were just taken — please reselect",
+          err?.requestId,
+        );
+        seatsQuery.refetch();
+        return;
+      }
+
+      toastError(
+        err?.message || "Failed to lock selected seats",
+        err?.requestId,
+      );
+    }
   };
 
   if (isLoading) {
@@ -207,7 +257,7 @@ export default function ShowtimeDetailPage() {
                       key={seat.id}
                       type="button"
                       disabled={availability !== "available"}
-                      onClick={() => toggleSeat(seat)}
+                      onClick={() => handleToggleSeat(seat)}
                       title={`${seatLabel} ${availability}`}
                       aria-label={`Seat ${seatLabel} - ${availability}`}
                       className={[
@@ -260,10 +310,10 @@ export default function ShowtimeDetailPage() {
           </p>
           <Button
             type="button"
-            disabled={selectedSeatIds.length === 0}
-            onClick={() => navigate("/bookings/confirm")}
+            disabled={selectedSeatIds.length === 0 || lockMutation.isPending}
+            onClick={handleSelectSeats}
           >
-            Select Seats
+            {lockMutation.isPending ? "Locking seats..." : "Select Seats"}
           </Button>
         </div>
       </div>

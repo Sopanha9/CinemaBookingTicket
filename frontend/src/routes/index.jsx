@@ -1,7 +1,10 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import AdminLayout from "../components/layout/AdminLayout";
 import CustomerLayout from "../components/layout/CustomerLayout";
+import BookingDetailPage from "../pages/BookingDetailPage";
+import ConfirmPage from "../pages/ConfirmPage";
 import LoginPage from "../pages/LoginPage";
+import MyBookingsPage from "../pages/MyBookingsPage";
 import RegisterPage from "../pages/RegisterPage";
 import ShowtimeDetailPage from "../pages/ShowtimeDetailPage";
 import ShowtimesPage from "../pages/ShowtimesPage";
@@ -13,10 +16,7 @@ import {
   AdminScreensPage,
   AdminShowtimesPage,
   AdminTheatersPage,
-  BookingDetailPage,
   BookingReportPage,
-  ConfirmPage,
-  MyBookingsPage,
   OccupancyReportPage,
   OperationsPage,
   PaymentPage,
