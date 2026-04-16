@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "../components/ui/Table";
 import { getBooking, updateBookingStatus } from "../features/booking/api";
+import { getPayments } from "../features/payments/api";
 import { toastError, toastSuccess } from "../lib/toast";
 
 const statusBadgeVariant = {
@@ -72,6 +73,12 @@ export default function BookingDetailPage() {
     enabled: Boolean(id),
   });
 
+  const bookingPaymentsQuery = useQuery({
+    queryKey: ["booking-payments", id],
+    queryFn: () => getPayments(id),
+    enabled: Boolean(id),
+  });
+
   const cancelMutation = useMutation({
     mutationFn: () =>
       updateBookingStatus(id, {
@@ -81,6 +88,9 @@ export default function BookingDetailPage() {
   });
 
   const booking = query.data;
+  const latestPayment = Array.isArray(bookingPaymentsQuery.data)
+    ? bookingPaymentsQuery.data[0]
+    : null;
   const canCancel =
     booking?.status === "pending" || booking?.status === "confirmed";
 
@@ -195,14 +205,102 @@ export default function BookingDetailPage() {
         <CardHeader>
           <CardTitle>Payment</CardTitle>
           <CardDescription>
-            Payment flow will be completed in the next phase.
+            Track and manage payment status for this booking.
           </CardDescription>
         </CardHeader>
-        <CardFooter className="justify-start">
-          <Button type="button" onClick={() => navigate(`/bookings/${id}/pay`)}>
-            {booking.status === "pending" ? "Pay Now" : "View Payment"}
-          </Button>
-        </CardFooter>
+        <CardContent className="space-y-3">
+          {bookingPaymentsQuery.isPending ? (
+            <Skeleton className="h-10 w-full" variant="shimmer" />
+          ) : null}
+
+          {bookingPaymentsQuery.isError ? (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-error/40 bg-error/10 p-3">
+              <p className="text-sm text-error">
+                Failed to load payment status.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => bookingPaymentsQuery.refetch()}
+              >
+                Retry
+              </Button>
+            </div>
+          ) : null}
+
+          {!bookingPaymentsQuery.isPending &&
+          !bookingPaymentsQuery.isError &&
+          !latestPayment ? (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-base-300 bg-base-200 p-3">
+              <p className="text-sm text-base-content/80">
+                No payment found for this booking.
+              </p>
+              <Button
+                type="button"
+                onClick={() => navigate(`/bookings/${id}/pay`)}
+              >
+                Pay Now
+              </Button>
+            </div>
+          ) : null}
+
+          {!bookingPaymentsQuery.isPending &&
+          !bookingPaymentsQuery.isError &&
+          latestPayment?.status === "pending" ? (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-warning/40 bg-warning/15 p-3">
+              <div>
+                <Badge variant="secondary">Payment Pending</Badge>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(`/bookings/${id}/pay`)}
+              >
+                View Payment
+              </Button>
+            </div>
+          ) : null}
+
+          {!bookingPaymentsQuery.isPending &&
+          !bookingPaymentsQuery.isError &&
+          latestPayment?.status === "paid" ? (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-green-400/40 bg-green-500/15 p-3">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className="border-green-400/50 bg-green-500/15 text-green-300"
+                >
+                  Paid
+                </Badge>
+                <span className="text-sm text-base-content/80">
+                  Amount: {formatCurrency(latestPayment.amount)}
+                </span>
+              </div>
+            </div>
+          ) : null}
+
+          {!bookingPaymentsQuery.isPending &&
+          !bookingPaymentsQuery.isError &&
+          latestPayment?.status === "failed" ? (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-error/40 bg-error/10 p-3">
+              <Badge variant="destructive">Payment Failed</Badge>
+              <Button
+                type="button"
+                onClick={() => navigate(`/bookings/${id}/pay`)}
+              >
+                Retry Payment
+              </Button>
+            </div>
+          ) : null}
+
+          {!bookingPaymentsQuery.isPending &&
+          !bookingPaymentsQuery.isError &&
+          latestPayment?.status === "refunded" ? (
+            <div className="rounded-lg border border-base-300 bg-base-200 p-3">
+              <Badge variant="outline">Refunded</Badge>
+            </div>
+          ) : null}
+        </CardContent>
       </Card>
 
       {canCancel ? (

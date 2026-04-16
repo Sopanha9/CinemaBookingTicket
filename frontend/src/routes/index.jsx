@@ -5,6 +5,7 @@ import BookingDetailPage from "../pages/BookingDetailPage";
 import ConfirmPage from "../pages/ConfirmPage";
 import LoginPage from "../pages/LoginPage";
 import MyBookingsPage from "../pages/MyBookingsPage";
+import PaymentPage from "../pages/PaymentPage";
 import RegisterPage from "../pages/RegisterPage";
 import ShowtimeDetailPage from "../pages/ShowtimeDetailPage";
 import ShowtimesPage from "../pages/ShowtimesPage";
@@ -19,7 +20,6 @@ import {
   BookingReportPage,
   OccupancyReportPage,
   OperationsPage,
-  PaymentPage,
   RevenueReportPage,
   TopMoviesPage,
 } from "../pages/placeholders";
