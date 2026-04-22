@@ -4,6 +4,93 @@
 
 @layer base {
   body {
-    @apply min-h-screen bg-base-200 text-base-content antialiased;
+    @apply min-h-screen bg-base-100 text-base-content antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
   }
+
+  /* Custom noir scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0c;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a30;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d4a017;
+  }
+
+  /* Selection color */
+  ::selection {
+    background: rgba(212, 160, 23, 0.25);
+    color: #ffffff;
+  }
+}
+
+@layer utilities {
+  /* Scanline texture */
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.015) 2px,
+      rgba(255, 255, 255, 0.015) 3px
+    );
+  }
+
+  /* Gold glow for selected seats */
+  .seat-glow {
+    box-shadow: 0 0 8px rgba(212, 160, 23, 0.4), 0 0 20px rgba(212, 160, 23, 0.15);
+  }
+
+  /* Card hover gold shimmer */
+  .card-noir:hover {
+    box-shadow: 0 0 30px rgba(212, 160, 23, 0.06), 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Text glow gold */
+  .text-glow-gold {
+    text-shadow: 0 0 20px rgba(212, 160, 23, 0.5);
+  }
+
+  /* Subtle vignette */
+  .vignette {
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.7) 100%);
+  }
+}
+
+/* Seat pulse animation for selected state */
+@keyframes seat-pulse {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(212, 160, 23, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(212, 160, 23, 0.6);
+  }
+}
+
+/* Fade in animation */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.4s ease forwards;
+}
+
+/* Input focus glow */
+input:focus, select:focus, textarea:focus {
+  box-shadow: 0 0 0 2px rgba(212, 160, 23, 0.2) !important;
 }

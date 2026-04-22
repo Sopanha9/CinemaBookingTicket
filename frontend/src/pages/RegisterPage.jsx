@@ -5,12 +5,6 @@ import { register as registerApi } from "../features/auth/api";
 import { useAuthStore } from "../features/auth/authStore";
 import { registerSchema } from "../features/auth/schemas";
 import { Button } from "../components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import {
   toastConflict,
@@ -48,38 +42,52 @@ export default function RegisterPage() {
         toastValidation(err.details);
         return;
       }
-
       if (err?.status === 409) {
-        toastConflict(
-          "An account with this email already exists",
-          err?.requestId,
-        );
+        toastConflict("An account with this email already exists", err?.requestId);
         return;
       }
-
       toastError(err?.message || "Registration failed", err?.requestId);
     }
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-base-100 px-4 py-10">
-      <Card variant="elevated" size="lg" className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-secondary">
-            Cinema Booking
-          </p>
-          <CardTitle className="text-2xl text-primary">
-            Create Account
-          </CardTitle>
-        </CardHeader>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#080809] px-4 py-10">
+      {/* Ambient glow blobs */}
+      <div className="pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-secondary/5 blur-[120px]" />
+      <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full bg-primary/5 blur-[100px]" />
 
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            <div className="space-y-1">
-              <label
-                htmlFor="name"
-                className="text-sm font-medium text-base-content/80"
-              >
+      {/* Film strip decorations */}
+      <div className="pointer-events-none absolute left-0 top-0 hidden h-full w-8 flex-col gap-4 opacity-10 lg:flex">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div key={i} className="mx-auto h-6 w-5 rounded-sm border border-white/30 bg-white/5" />
+        ))}
+      </div>
+      <div className="pointer-events-none absolute right-0 top-0 hidden h-full w-8 flex-col gap-4 opacity-10 lg:flex">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div key={i} className="mx-auto h-6 w-5 rounded-sm border border-white/30 bg-white/5" />
+        ))}
+      </div>
+
+      <div className="w-full max-w-md">
+        {/* Logo mark */}
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full border border-secondary/30 bg-secondary/10 text-secondary text-2xl">
+            ◎
+          </div>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-secondary/80">
+            Cinema Noir
+          </p>
+          <h1 className="mt-2 text-3xl font-black uppercase tracking-tight text-white">
+            Create Account
+          </h1>
+          <p className="mt-1 text-sm text-white/40">Join the experience</p>
+        </div>
+
+        {/* Card */}
+        <div className="rounded-2xl border border-white/[0.07] bg-[#111114] p-8 shadow-2xl">
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+            <div className="space-y-1.5">
+              <label htmlFor="name" className="block text-xs font-bold uppercase tracking-widest text-secondary/70">
                 Name
               </label>
               <Input
@@ -95,11 +103,8 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className="space-y-1">
-              <label
-                htmlFor="email"
-                className="text-sm font-medium text-base-content/80"
-              >
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-xs font-bold uppercase tracking-widest text-secondary/70">
                 Email
               </label>
               <Input
@@ -115,18 +120,15 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className="space-y-1">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-base-content/80"
-              >
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="block text-xs font-bold uppercase tracking-widest text-secondary/70">
                 Password
               </label>
               <Input
                 id="password"
                 type="password"
                 autoComplete="new-password"
-                placeholder="At least 8 chars, uppercase + number"
+                placeholder="Min 8 chars, uppercase + number"
                 variant={errors.password ? "error" : "default"}
                 {...register("password")}
               />
@@ -135,11 +137,8 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className="space-y-1">
-              <label
-                htmlFor="phone"
-                className="text-sm font-medium text-base-content/80"
-              >
+            <div className="space-y-1.5">
+              <label htmlFor="phone" className="block text-xs font-bold uppercase tracking-widest text-secondary/70">
                 Phone
               </label>
               <Input
@@ -155,22 +154,25 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="w-full !bg-primary hover:!bg-primary/90 !text-white !font-bold !uppercase !tracking-widest !text-sm !py-3" disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Create Account"}
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-base-content/70">
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/[0.07]" />
+            <span className="text-xs text-white/30">OR</span>
+            <div className="h-px flex-1 bg-white/[0.07]" />
+          </div>
+
+          <p className="text-center text-sm text-white/40">
             Already have an account?{" "}
-            <Link
-              to="/login"
-              className="font-semibold text-secondary hover:text-secondary/80"
-            >
+            <Link to="/login" className="font-bold text-secondary hover:text-secondary/80 transition-colors">
               Sign in
             </Link>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </main>
   );
 }
